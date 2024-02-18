@@ -45,9 +45,16 @@ copy_files=($EMBED_FRAMEWORKS $EMBED_LIBRARIES)
 [[ $USE_OVERLAY = 1 ]] && inject_files+=("$OVERLAY")
 [[ $GENERATOR == "MobileSubstrate" ]] && copy_files+=("$SUBSTRATE")
 
+if [ ! -z "$CUSTOM_INJECTOR_FRAMEWORK_NAME" ]; then
+	log 2 "not injecting dylib since $CUSTOM_INJECTOR_FRAMEWORK_NAME framework will be used"
+    inject_files=()
+	copy_files+=("$THEOS_JAILED_LIB/$CUSTOM_INJECTOR_FRAMEWORK_NAME.framework")
+fi
+
 full_copy_path="$appdir/$COPY_PATH"
 mkdir -p "$full_copy_path"
 for file in "${inject_files[@]}" "${copy_files[@]}"; do
+	log 3 "copying $file"
 	copy "$file" "$full_copy_path"
 done
 
@@ -62,6 +69,12 @@ for file in "${inject_files[@]}"; do
 		error "Failed to inject $filename into $app"
 	fi
 done
+
+if [ ! -z "$CUSTOM_INJECTOR_FRAMEWORK_NAME" ]; then
+	log 3 "Setting @rpath/$CUSTOM_INJECTOR_FRAMEWORK_NAME.framework/$CUSTOM_INJECTOR_FRAMEWORK_NAME into app"
+	$INSERT_DYLIB --inplace --all-yes "@rpath/$CUSTOM_INJECTOR_FRAMEWORK_NAME.framework/$CUSTOM_INJECTOR_FRAMEWORK_NAME" "$app_binary"
+fi
+
 
 chmod +x "$app_binary"
 
