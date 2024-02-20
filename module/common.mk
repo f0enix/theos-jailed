@@ -1,7 +1,7 @@
 # Module paths
 THEOS_JAILED_PATH := $(THEOS_MODULE_PATH)/jailed
 THEOS_JAILED_BIN := $(THEOS_JAILED_PATH)/bin
-export THEOS_JAILED_LIB := $(THEOS_JAILED_PATH)/lib
+THEOS_JAILED_LIB := $(THEOS_JAILED_PATH)/lib
 
 # Shell scripts
 export MESSAGES := $(THEOS_JAILED_BIN)/messages.sh
